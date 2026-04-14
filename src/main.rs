@@ -1,3 +1,9 @@
-fn main() {
-    println!("Hello, world!");
-}
+// RUST IMAGE VIEWER
+// RESTRICTIONS: ONLY STD LIBRARY
+// 
+// IMPLEMENTATION STEPS:
+// 1) READ FILE
+// 2) OPEN OS WINDOW
+// 3) PAINT WINDOW 
+// 4) ???
+// 5) PROFIT
