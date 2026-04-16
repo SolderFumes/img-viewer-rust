@@ -3,8 +3,9 @@ use std::io::prelude::*;
 pub fn read_bmp(target_file: &str) -> Result<Vec<u8>, std::io::Error> { 
     let mut file: File = File::open(target_file)?; //File::open returns a Result<()> so we use ?
                                              //to unpack the actual return value. 
-    let mut header: [u8; 52] = [0; 52];
+    let mut header: [u8; 62] = [0; 62];
     file.read_exact(&mut header)?; // This will read until buf is full.
+    dbg!(header);
 
     //header now has the header.
     // We need to extract the size of the entire file and the pointer to the actual image.
@@ -18,7 +19,7 @@ pub fn read_bmp(target_file: &str) -> Result<Vec<u8>, std::io::Error> {
     println!("");
 
     //52 bytes are header so subtract that from size :) 
-    let size: u32 = bytes_to_decimal(&size_slice) - 52;
+    let size: u32 = bytes_to_decimal(&size_slice) - 62;
 
     println!("File is {} bytes long.", size);
     // Thanks to file cursors, we don't need to find the image pointer as we have already "consumed"
@@ -32,7 +33,18 @@ pub fn read_bmp(target_file: &str) -> Result<Vec<u8>, std::io::Error> {
     let mut img_vec: Vec<u8> = vec![0; size as usize];
     file.read_exact(&mut img_vec).expect("Did not read image data correctly.");
 
+    let _ = write_raw([&header[..], &img_vec[..]].concat().as_slice());
+
+    // We need to take care of padding that is added in to make each row a multiple of 4 bytes long.
+
     return Ok(img_vec);
+}
+
+fn write_raw(data: &[u8]) -> Result<(), std::io::Error> {
+    let mut file_to_write: File = File::create("output.bmp")?;
+    file_to_write.write(data);
+
+    return Ok(())
 }
 
 // expects a 4-byte slice and converts it to decimal.
